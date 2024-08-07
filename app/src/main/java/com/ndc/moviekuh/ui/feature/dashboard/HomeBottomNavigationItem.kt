@@ -1,4 +1,4 @@
-package com.ndc.moviekuh.ui.screen.dashboard
+package com.ndc.moviekuh.ui.feature.dashboard
 
 data class HomeBottomNavigationItem(
     val label: String,

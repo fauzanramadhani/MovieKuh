@@ -1,10 +1,10 @@
 package com.ndc.moviekuh.data.module
 
 import android.content.Context
-import androidx.room.Room
 import com.ndc.moviekuh.BuildConfig
 import com.ndc.moviekuh.data.source.local.room.MovieKuhDatabase
 import com.ndc.moviekuh.data.source.local.sharedpref.SharedPreferencesManager
+import com.ndc.moviekuh.data.source.network.service.MovieService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,13 +27,10 @@ object MovieKuhModule {
     @Provides
     fun provideDatabase(
         @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context,
-        MovieKuhDatabase::class.java, "db_moviekuh"
-    ).build()
+    ) = MovieKuhDatabase.getDatabase(context)
 
     @Provides
-    fun provideRetrofit() : Retrofit {
+    fun provideRetrofit(): Retrofit {
         val authorizationInterceptor = Interceptor { chain ->
             val originalRequest = chain.request()
             val newRequest = originalRequest.newBuilder()
@@ -55,4 +52,9 @@ object MovieKuhModule {
             .client(createOkHttp)
             .build()
     }
+
+    @Provides
+    fun provideMovieService(
+        retrofit: Retrofit
+    ): MovieService = retrofit.create(MovieService::class.java)
 }

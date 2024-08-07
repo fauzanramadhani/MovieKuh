@@ -1,4 +1,4 @@
-package com.ndc.moviekuh.ui.screen.dashboard
+package com.ndc.moviekuh.ui.feature.dashboard
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,8 +40,8 @@ import androidx.navigation.NavHostController
 import com.ndc.moviekuh.R
 import com.ndc.moviekuh.ui.component.bottomsheet.NotReadyBottomSheet
 import com.ndc.moviekuh.ui.component.textfield.PrimaryTextField
-import com.ndc.moviekuh.ui.screen.dashboard.screen.FavoriteScreen
-import com.ndc.moviekuh.ui.screen.dashboard.screen.PopularNews
+import com.ndc.moviekuh.ui.feature.dashboard.screen.FavoriteScreen
+import com.ndc.moviekuh.ui.feature.dashboard.screen.MainScreen
 import com.ndc.moviekuh.utils.Toast
 import kotlinx.coroutines.launch
 
@@ -63,7 +63,7 @@ fun DashboardScreen(
             selectedIcon = R.drawable.ic_home_fill,
         ),
         HomeBottomNavigationItem(
-            label = "Favorite",
+            label = "Favorit",
             unselectedIcon = R.drawable.ic_favorite,
             selectedIcon = R.drawable.ic_favorite_fill
         )
@@ -72,7 +72,10 @@ fun DashboardScreen(
         skipPartiallyExpanded = true
     )
     val scope = rememberCoroutineScope()
-    val mainListState = rememberLazyGridState()
+    val mainVerticalScrollState = rememberScrollState()
+    val popularListState = rememberLazyListState()
+    val nowPlayingListState = rememberLazyListState()
+    val topRatedListState = rememberLazyListState()
     val favoriteListState = rememberLazyListState()
 
     BackHandler {
@@ -82,7 +85,7 @@ fun DashboardScreen(
     LaunchedEffect(effect) {
         when (effect) {
             DashboardEffect.Empty -> {}
-            is DashboardEffect.OnError -> Toast(ctx, effect.message).short()
+            is DashboardEffect.OnShowToast -> Toast(ctx, effect.message).short()
         }
     }
 
@@ -110,7 +113,7 @@ fun DashboardScreen(
             containerColor = color.background,
             dragHandle = null,
         ) {
-            when (val data = state.homeBottomSheetType) {
+            when (val data = state.dashboardBottomSheetType) {
                 HomeBottomSheetType.NotReady -> NotReadyBottomSheet()
             }
         }
@@ -154,7 +157,7 @@ fun DashboardScreen(
                         modifier = Modifier
                             .weight(0.8f)
                             .clickable {
-                                // TODO: ON SEARCH
+
                             }
                     )
                     Icon(
@@ -176,6 +179,7 @@ fun DashboardScreen(
                             }
                     )
                 }
+
                 1 -> Row {
                     Row(
                         modifier = Modifier
@@ -215,8 +219,12 @@ fun DashboardScreen(
         }
     ) { paddingValues ->
         when (state.currentScreen) {
-            0 -> PopularNews(
-                listState = mainListState,
+            0 -> MainScreen(
+                navHostController = navHostController,
+                verticalScrollState = mainVerticalScrollState,
+                popularListState = popularListState,
+                nowPlayingListState = nowPlayingListState,
+                topRatedListState = topRatedListState,
                 paddingValues = paddingValues,
                 state = state,
                 action = action

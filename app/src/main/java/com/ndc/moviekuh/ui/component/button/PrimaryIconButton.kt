@@ -20,7 +20,8 @@ fun PrimaryIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     text: String = "",
-    icon: @Composable () -> Unit = {},
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
     onClick: () -> Unit = {}
 ) {
     val color = MaterialTheme.colorScheme
@@ -40,13 +41,14 @@ fun PrimaryIconButton(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .background(if (enabled) color.primary else color.onPrimaryContainer)
-                .padding(4.dp)
+                .padding(8.dp)
         ) {
-            icon.invoke()
+            leadingIcon?.invoke()
             Text(
                 text = text,
                 style = typography.labelSmall,
             )
+            trailingIcon?.invoke()
         }
     }
 }

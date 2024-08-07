@@ -1,10 +1,10 @@
-package com.ndc.moviekuh.ui.screen.dashboard.screen
+package com.ndc.moviekuh.ui.feature.dashboard.screen
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import com.ndc.moviekuh.ui.screen.dashboard.DashboardAction
-import com.ndc.moviekuh.ui.screen.dashboard.DashboardState
+import com.ndc.moviekuh.ui.feature.dashboard.DashboardAction
+import com.ndc.moviekuh.ui.feature.dashboard.DashboardState
 
 @Composable
 fun FavoriteScreen(

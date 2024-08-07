@@ -1,8 +1,8 @@
-package com.ndc.moviekuh.ui.screen.dashboard
+package com.ndc.moviekuh.ui.feature.dashboard
 
 sealed interface DashboardEffect {
     data object Empty : DashboardEffect
-    data class OnError(
+    data class OnShowToast(
         val message: String
     ) : DashboardEffect
 }
