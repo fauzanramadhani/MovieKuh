@@ -231,6 +231,7 @@ fun DashboardScreen(
             )
 
             1 -> FavoriteScreen(
+                navHostController = navHostController,
                 listState = favoriteListState,
                 paddingValues = paddingValues,
                 state = state,

@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,28 +36,35 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.ndc.moviekuh.R
+import com.ndc.moviekuh.data.source.local.constant.genresMap
+import com.ndc.moviekuh.data.source.local.room.dto.FavoriteDto
 import com.ndc.moviekuh.ui.component.chip.GenreChip
 import com.ndc.moviekuh.ui.component.topbar.TopBarSecondary
 import com.ndc.moviekuh.ui.theme.MovieKuhTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DetailScreen(
+fun DetailMovieScreen(
     navHostController: NavHostController,
     state: DetailMovieState,
     effect: DetailMovieEffect,
     action: (DetailMovieAction) -> Unit,
     imageUrl: String,
     title: String,
-    genreList: List<String>,
+    genreList: List<Int>,
     rating: Float,
     ratingCount: Int,
     release: String,
     isAdult: Boolean,
-    summary: String
+    summary: String,
+    id: Int,
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+
+    LaunchedEffect(Unit) {
+        action(DetailMovieAction.OnGetIsFavorite(id))
+    }
 
     Scaffold(
         topBar = {
@@ -63,6 +72,40 @@ fun DetailScreen(
                 title = "Detail Film"
             ) {
                 navHostController.navigateUp()
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.padding(12.dp),
+                contentColor = color.onPrimaryContainer,
+                containerColor = color.primaryContainer,
+                shape = RoundedCornerShape(16.dp),
+                onClick = {
+                    action(
+                        DetailMovieAction.OnFavoriteChange(
+                            FavoriteDto(
+                                id = id,
+                                overview = summary,
+                                title = title,
+                                genreIds = genreList,
+                                posterPath = imageUrl,
+                                releaseDate = release,
+                                voteAverage = rating,
+                                voteCount = ratingCount,
+                                adult = isAdult,
+                                createdAt = System.currentTimeMillis()
+                            )
+                        )
+                    )
+                }
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = if (state.isFavorite) R.drawable.ic_favorite_fill
+                        else R.drawable.ic_favorite
+                    ),
+                    contentDescription = ""
+                )
             }
         },
         modifier = Modifier
@@ -111,7 +154,7 @@ fun DetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        genreList.forEach {
+                        genreList.map { genresMap[it] ?: "" }.forEach {
                             GenreChip(text = it)
                         }
                     }
@@ -205,7 +248,7 @@ fun DetailScreen(
 @Composable
 fun DetailScreenPreview() {
     MovieKuhTheme {
-        DetailScreen(
+        DetailMovieScreen(
             navHostController = rememberNavController(),
             effect = DetailMovieEffect.Empty,
             state = DetailMovieState(),
@@ -214,12 +257,13 @@ fun DetailScreenPreview() {
             },
             imageUrl = "https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
             title = "Deadpool & Wolverine ",
-            genreList = listOf("Action"),
+            genreList = listOf(28),
             rating = 7.9F,
             ratingCount = 1886,
             release = "05-12-2001",
             isAdult = true,
-            summary = "Super-Hero partners Scott Lang and Hope van Dyne, along with with Hope's parents Janet van Dyne and Hank Pym, and Scott's daughter Cassie Lang, find themselves exploring the Quantum Realm, interacting with strange new creatures and embarking on an adventure that will push them beyond the limits of what they thought possible."
+            summary = "Super-Hero partners Scott Lang and Hope van Dyne, along with with Hope's parents Janet van Dyne and Hank Pym, and Scott's daughter Cassie Lang, find themselves exploring the Quantum Realm, interacting with strange new creatures and embarking on an adventure that will push them beyond the limits of what they thought possible.",
+            id = 1
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.ndc.moviekuh.ui.feature.dashboard
 
+import com.ndc.moviekuh.data.source.local.room.dto.FavoriteDto
 import com.ndc.moviekuh.data.source.network.response.NowPlayingMovieItem
 import com.ndc.moviekuh.data.source.network.response.PopularMovieItem
 import com.ndc.moviekuh.data.source.network.response.TopRatedMovieItem
@@ -16,4 +17,6 @@ data class DashboardState(
     val popularMovieList: List<PopularMovieItem> = emptyList(),
     val nowPlayingMovieList: List<NowPlayingMovieItem> = emptyList(),
     val topRatedMovieList: List<TopRatedMovieItem> = emptyList(),
+    // favorite screen
+    val favoriteMovieList: List<FavoriteDto> = emptyList(),
 )

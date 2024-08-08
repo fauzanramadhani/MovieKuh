@@ -131,7 +131,8 @@ fun MainScreen(
                                 ratingCount = movie.voteCount,
                                 release = movie.releaseDate,
                                 isAdult = movie.adult,
-                                summary = movie.overview
+                                summary = movie.overview,
+                                id = movie.id
                             )
                         ) {
                             launchSingleTop = true
@@ -205,7 +206,8 @@ fun MainScreen(
                                 ratingCount = movie.voteCount,
                                 release = movie.releaseDate,
                                 isAdult = movie.adult,
-                                summary = movie.overview
+                                summary = movie.overview,
+                                id = movie.id
                             )
                         ) {
                             launchSingleTop = true
@@ -279,7 +281,8 @@ fun MainScreen(
                                 ratingCount = movie.voteCount,
                                 release = movie.releaseDate,
                                 isAdult = movie.adult,
-                                summary = movie.overview
+                                summary = movie.overview,
+                                id = movie.id
                             )
                         ) {
                             launchSingleTop = true

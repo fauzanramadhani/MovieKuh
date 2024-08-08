@@ -2,9 +2,11 @@ package com.ndc.moviekuh.ui.feature.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.ndc.moviekuh.base.BaseViewModel
+import com.ndc.moviekuh.data.source.local.room.dto.FavoriteDto
 import com.ndc.moviekuh.data.source.network.response.NowPlayingMovieItem
 import com.ndc.moviekuh.data.source.network.response.PopularMovieItem
 import com.ndc.moviekuh.data.source.network.response.TopRatedMovieItem
+import com.ndc.moviekuh.domain.GetAllFavoriteListUseCase
 import com.ndc.moviekuh.domain.GetNowPlayingMovieListUseCase
 import com.ndc.moviekuh.domain.GetPopularMovieListUseCase
 import com.ndc.moviekuh.domain.GetTopRatedMovieListUseCase
@@ -12,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
@@ -24,6 +27,7 @@ class DashboardViewModel @Inject constructor(
     private val getPopularMovieListUseCase: GetPopularMovieListUseCase,
     private val getNowPlayingMovieListUseCase: GetNowPlayingMovieListUseCase,
     private val getTopRatedMovieListUseCase: GetTopRatedMovieListUseCase,
+    private val getAllFavoriteListUseCase: GetAllFavoriteListUseCase
 ) : BaseViewModel<DashboardState, DashboardAction, DashboardEffect>(
     DashboardState()
 ) {
@@ -31,6 +35,7 @@ class DashboardViewModel @Inject constructor(
         getPopularMovieList()
         getNowPlayingMovieList()
         getTopRatedMovieList()
+        getAllFavoriteList()
     }
 
     override fun onAction(action: DashboardAction) {
@@ -120,6 +125,19 @@ class DashboardViewModel @Inject constructor(
                         topRatedMovieLoading = false
                     )
                 }
+            }
+            .collect()
+    }
+
+    private fun getAllFavoriteList() = viewModelScope.launch {
+        getAllFavoriteListUseCase
+            .invoke()
+            .map { it.sortedByDescending { it.createdAt } }
+            .onEach {
+                updateState { copy(favoriteMovieList = it as List<FavoriteDto>) }
+            }
+            .catch {
+                onShowToast(it.message.toString())
             }
             .collect()
     }

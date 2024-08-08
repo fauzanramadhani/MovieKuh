@@ -1,54 +1,50 @@
 package com.ndc.moviekuh.ui.feature.detailtoprated
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.ndc.moviekuh.base.BaseViewModel
 import com.ndc.moviekuh.data.source.network.response.TopRatedMovieItem
-import com.ndc.moviekuh.domain.GetTopRatedMovieListUseCase
+import com.ndc.moviekuh.domain.GetTopRatedMoviePagingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailTopRatedMovieViewModel @Inject constructor(
-    private val getTopRatedMovieListUseCase: GetTopRatedMovieListUseCase
+    private val getTopRatedMoviePagingUseCase: GetTopRatedMoviePagingUseCase
 ) : BaseViewModel<DetailTopRatedMovieState, DetailTopRatedMovieAction, DetailTopRatedMovieEffect>(
     DetailTopRatedMovieState()
 ) {
+    private val _topRatedMoviePagingState: MutableStateFlow<PagingData<TopRatedMovieItem>> =
+        MutableStateFlow(value = PagingData.empty())
+    val topRatedMoviePagingState: StateFlow<PagingData<TopRatedMovieItem>> get() = _topRatedMoviePagingState
+
     init {
-        getTopRatedMovieList()
+        getTopRatedMoviePaging()
     }
 
     override fun onAction(action: DetailTopRatedMovieAction) {
 
     }
 
-    private fun getTopRatedMovieList() = viewModelScope.launch {
-        getTopRatedMovieListUseCase
+    private fun getTopRatedMoviePaging() = viewModelScope.launch {
+        getTopRatedMoviePagingUseCase
             .invoke()
-            .retry { cause ->
-                when (cause) {
-                    is IOException -> true
-                    is HttpException -> true
-                    else -> false
-                }
-            }
+            .distinctUntilChanged()
             .catch {
                 onShowToast(it.message.toString())
             }
+            .cachedIn(this)
             .onEach {
-                updateState {
-                    copy(
-                        topRatedMovieList = it as List<TopRatedMovieItem>,
-                        topRatedMovieLoading = false
-                    )
-                }
+                _topRatedMoviePagingState.value = it
             }
             .collect()
     }

@@ -1,50 +1,46 @@
 package com.ndc.moviekuh.ui.feature.detailnowplayingmovie
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.ndc.moviekuh.base.BaseViewModel
 import com.ndc.moviekuh.data.source.network.response.NowPlayingMovieItem
-import com.ndc.moviekuh.domain.GetNowPlayingMovieListUseCase
+import com.ndc.moviekuh.domain.GetNowPlayingMoviePagingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailNowPlayingMovieViewModel @Inject constructor(
-    private val getNowPlayingMovieListUseCase: GetNowPlayingMovieListUseCase
+    private val getNowPlayingMoviePagingUseCase: GetNowPlayingMoviePagingUseCase
 ) : BaseViewModel<DetailNowPlayingMovieState, DetailNowPlayingMovieAction, DetailNowPlayingMovieEffect>(
     DetailNowPlayingMovieState()
 ) {
+    private val _nowPlayingMoviePagingState: MutableStateFlow<PagingData<NowPlayingMovieItem>> =
+        MutableStateFlow(value = PagingData.empty())
+    val nowPlayingMoviePagingState: StateFlow<PagingData<NowPlayingMovieItem>> get() = _nowPlayingMoviePagingState
+
     init {
-        getNowPlayingMovieList()
+        getNowPlayingMoviePaging()
     }
 
-    private fun getNowPlayingMovieList() = viewModelScope.launch {
-        getNowPlayingMovieListUseCase
+    private fun getNowPlayingMoviePaging() = viewModelScope.launch {
+        getNowPlayingMoviePagingUseCase
             .invoke()
-            .retry { cause ->
-                when (cause) {
-                    is IOException -> true
-                    is HttpException -> true
-                    else -> false
-                }
-            }
+            .distinctUntilChanged()
             .catch {
                 onShowToast(it.message.toString())
             }
+            .cachedIn(this)
             .onEach {
-                updateState {
-                    copy(
-                        nowPlayingMovieList = it as List<NowPlayingMovieItem>,
-                        nowPlayingMovieLoading = false
-                    )
-                }
+                _nowPlayingMoviePagingState.value = it
             }
             .collect()
     }

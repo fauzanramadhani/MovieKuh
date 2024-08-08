@@ -9,13 +9,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.ndc.moviekuh.data.source.local.constant.genresMap
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardEffect
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardScreen
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardViewModel
 import com.ndc.moviekuh.ui.feature.detailmovie.DetailMovieEffect
 import com.ndc.moviekuh.ui.feature.detailmovie.DetailMovieViewModel
-import com.ndc.moviekuh.ui.feature.detailmovie.DetailScreen
+import com.ndc.moviekuh.ui.feature.detailmovie.DetailMovieScreen
 import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieEffect
 import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieScreen
 import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieViewModel
@@ -81,6 +81,9 @@ fun SetupNavHost(
                 navArgument(keyH) {
                     type = NavType.StringType
                 },
+                navArgument(keyI) {
+                    type = NavType.IntType
+                },
             )
         ) { navBackStackEntry ->
             val viewModel = hiltViewModel<DetailMovieViewModel>()
@@ -89,15 +92,15 @@ fun SetupNavHost(
             val imageUrl = navBackStackEntry.arguments?.getString(keyA)?.decode() ?: ""
             val title = navBackStackEntry.arguments?.getString(keyB)?.decode() ?: ""
             val genreList = (navBackStackEntry.arguments?.getString(keyC)?.decode() ?: "")
-                .split(", ").map { it.toInt() }.map { genresMap[it] ?: "" }
-                .filter { it.isNotEmpty() }
+                .split(", ").map { it.toInt() }
             val rating = navBackStackEntry.arguments?.getFloat(keyD) ?: 0f
             val ratingCount = navBackStackEntry.arguments?.getInt(keyE) ?: 0
             val release = navBackStackEntry.arguments?.getString(keyF)?.decode() ?: ""
             val isAdult = navBackStackEntry.arguments?.getBoolean(keyG) ?: false
             val summary = navBackStackEntry.arguments?.getString(keyH)?.decode() ?: ""
+            val id = navBackStackEntry.arguments?.getInt(keyI) ?: 0
 
-            DetailScreen(
+            DetailMovieScreen(
                 navHostController = navHostController,
                 state = state,
                 effect = effect,
@@ -109,7 +112,8 @@ fun SetupNavHost(
                 ratingCount = ratingCount,
                 release = release,
                 isAdult = isAdult,
-                summary = summary
+                summary = summary,
+                id = id
             )
         }
 
@@ -119,12 +123,14 @@ fun SetupNavHost(
             val viewModel = hiltViewModel<DetailPopularMovieViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailPopularMovieEffect.Empty)
+            val popularMoviePagingItems = viewModel.popularMoviePagingState.collectAsLazyPagingItems()
 
             DetailPopularMovieScreen(
                 navHostController = navHostController,
                 state = state,
                 effect = effect,
-                action = viewModel::onAction
+                action = viewModel::onAction,
+                popularMoviePagingItems = popularMoviePagingItems
             )
         }
 
@@ -134,12 +140,14 @@ fun SetupNavHost(
             val viewModel = hiltViewModel<DetailNowPlayingMovieViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailNowPlayingMovieEffect.Empty)
+            val nowPlayingMoviePagingItems = viewModel.nowPlayingMoviePagingState.collectAsLazyPagingItems()
 
             DetailNowPlayingMovieScreen(
                 navHostController = navHostController,
                 state = state,
                 effect = effect,
-                action = viewModel::onAction
+                action = viewModel::onAction,
+                nowPlayingMoviePagingItems = nowPlayingMoviePagingItems
             )
         }
 
@@ -149,12 +157,14 @@ fun SetupNavHost(
             val viewModel = hiltViewModel<DetailTopRatedMovieViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailTopRatedMovieEffect.Empty)
+            val topRatedMoviePagingItems = viewModel.topRatedMoviePagingState.collectAsLazyPagingItems()
 
             DetailTopRatedMovieScreen(
                 navHostController = navHostController,
                 state = state,
                 effect = effect,
-                action = viewModel::onAction
+                action = viewModel::onAction,
+                topRatedMoviePagingItems = topRatedMoviePagingItems
             )
         }
 

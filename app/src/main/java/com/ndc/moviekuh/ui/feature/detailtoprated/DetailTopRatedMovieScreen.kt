@@ -11,15 +11,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import com.ndc.moviekuh.data.source.network.response.TopRatedMovieItem
 import com.ndc.moviekuh.ui.component.card.SecondaryMovieCard
 import com.ndc.moviekuh.ui.component.shimmer.shimmerBrush
 import com.ndc.moviekuh.ui.component.topbar.TopBarSecondary
@@ -31,14 +36,16 @@ fun DetailTopRatedMovieScreen(
     state: DetailTopRatedMovieState,
     effect: DetailTopRatedMovieEffect,
     action: (DetailTopRatedMovieAction) -> Unit,
+    topRatedMoviePagingItems: LazyPagingItems<TopRatedMovieItem>,
 ) {
     val color = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
+    val lazyListState = rememberLazyListState()
 
     Scaffold(
         topBar = {
             TopBarSecondary(
-                title = "Peringkat Teratas"
+                title = state.titleAppBar
             ) {
                 navHostController.navigateUp()
             }
@@ -53,21 +60,14 @@ fun DetailTopRatedMovieScreen(
                 .padding(paddingValues)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(16.dp),
+            state = lazyListState
         ) {
-            if (state.topRatedMovieLoading)
-                items(3) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(shimmerBrush())
-                            .fillMaxWidth()
-                            .width(158.dp)
-                            .height(91.dp)
-                    )
-                }
-            else
-                items(state.topRatedMovieList) { movie ->
+            items(
+                key = { it },
+                count = topRatedMoviePagingItems.itemCount
+            ) {
+                topRatedMoviePagingItems[it]?.let { movie ->
                     SecondaryMovieCard(
                         movieImage = "https://image.tmdb.org/t/p/original${movie.posterPath}",
                         movieName = movie.originalTitle,
@@ -82,13 +82,48 @@ fun DetailTopRatedMovieScreen(
                                 ratingCount = movie.voteCount,
                                 release = movie.releaseDate,
                                 isAdult = movie.adult,
-                                summary = movie.overview
+                                summary = movie.overview,
+                                id = movie.id
                             )
                         ) {
                             launchSingleTop = true
                         }
                     }
                 }
+            }
+            topRatedMoviePagingItems.apply {
+                when {
+                    loadState.refresh is LoadState.Loading -> {
+                        items(3) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(shimmerBrush())
+                                    .fillMaxWidth()
+                                    .width(158.dp)
+                                    .height(91.dp)
+                            )
+                        }
+                    }
+
+                    loadState.refresh is LoadState.Error -> retry()
+
+                    loadState.append is LoadState.Error -> retry()
+
+                    loadState.append is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .padding(vertical = 16.dp)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = color.primary)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,54 +1,50 @@
 package com.ndc.moviekuh.ui.feature.detailpopularmovie
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.ndc.moviekuh.base.BaseViewModel
 import com.ndc.moviekuh.data.source.network.response.PopularMovieItem
-import com.ndc.moviekuh.domain.GetPopularMovieListUseCase
+import com.ndc.moviekuh.domain.GetPopularMoviePagingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailPopularMovieViewModel @Inject constructor(
-    private val getPopularMovieListUseCase: GetPopularMovieListUseCase
+    private val getPopularMoviePagingUseCase: GetPopularMoviePagingUseCase
 ) : BaseViewModel<DetailPopularMovieState, DetailPopularMovieAction, DetailPopularMovieEffect>(
     DetailPopularMovieState()
 ) {
+    private val _popularMoviePagingState: MutableStateFlow<PagingData<PopularMovieItem>> =
+        MutableStateFlow(value = PagingData.empty())
+    val popularMoviePagingState: StateFlow<PagingData<PopularMovieItem>> get() = _popularMoviePagingState
+
     init {
-        getPopularMovieList()
+        getPopularMoviePaging()
     }
 
     override fun onAction(action: DetailPopularMovieAction) {
 
     }
 
-    private fun getPopularMovieList() = viewModelScope.launch {
-        getPopularMovieListUseCase
+    private fun getPopularMoviePaging() = viewModelScope.launch {
+        getPopularMoviePagingUseCase
             .invoke()
-            .retry { cause ->
-                when (cause) {
-                    is IOException -> true
-                    is HttpException -> true
-                    else -> false
-                }
-            }
+            .distinctUntilChanged()
             .catch {
                 onShowToast(it.message.toString())
             }
+            .cachedIn(this)
             .onEach {
-                updateState {
-                    copy(
-                        popularMovieList = it as List<PopularMovieItem>,
-                        popularMovieLoading = false
-                    )
-                }
+                _popularMoviePagingState.value = it
             }
             .collect()
     }

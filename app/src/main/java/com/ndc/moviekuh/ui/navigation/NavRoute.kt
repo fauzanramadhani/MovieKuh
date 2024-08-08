@@ -11,13 +11,14 @@ const val keyE = "KEY_E"
 const val keyF = "KEY_F"
 const val keyG = "KEY_G"
 const val keyH = "KEY_H"
+const val keyI = "KEY_I"
 
 
 sealed class NavRoute(val route: String) {
     data object MainRoute : NavRoute("MAIN_ROUTE")
     data object DashboardScreen : NavRoute("DASHBOARD_SCREEN")
     data object DetailMovieScreen :
-        NavRoute("DETAIL_MOVIE_SCREEN/{$keyA}/{$keyB}/{$keyC}/{$keyD}/{$keyE}/{$keyF}/{$keyG}/{$keyH}") {
+        NavRoute("DETAIL_MOVIE_SCREEN/{$keyA}/{$keyB}/{$keyC}/{$keyD}/{$keyE}/{$keyF}/{$keyG}/{$keyH}/{$keyI}") {
         fun navigateWithData(
             imageUrl: String,
             title: String,
@@ -26,7 +27,8 @@ sealed class NavRoute(val route: String) {
             ratingCount: Int,
             release: String,
             isAdult: Boolean,
-            summary: String
+            summary: String,
+            id: Int
         ): String {
             val encodedImageUrl = imageUrl.encode()
             val encodedTitle = title.encode()
@@ -36,7 +38,7 @@ sealed class NavRoute(val route: String) {
 
             return "DETAIL_MOVIE_SCREEN/$encodedImageUrl/$encodedTitle/" +
                     "$encodedGenreListString/$rating/$ratingCount/" +
-                    "$encodedRelease/$isAdult/$encodedSummary"
+                    "$encodedRelease/$isAdult/$encodedSummary/$id"
         }
     }
     data object DetailPopularMovieScreen : NavRoute("DETAIL_POPULAR_MOVIE_SCREEN")

@@ -57,4 +57,9 @@ object MovieKuhModule {
     fun provideMovieService(
         retrofit: Retrofit
     ): MovieService = retrofit.create(MovieService::class.java)
+
+    @Provides
+    fun provideFavoriteMovieDao(
+        movieKuhDatabase: MovieKuhDatabase
+    ) = movieKuhDatabase.favoriteMovieDao()
 }

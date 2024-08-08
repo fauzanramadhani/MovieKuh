@@ -96,4 +96,8 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+    // Jetpack compose paging
+    implementation ("androidx.paging:paging-runtime:3.2.0-alpha06")
+    implementation ("androidx.paging:paging-compose:1.0.0-alpha20")
+    implementation("androidx.paging:paging-common-android:3.3.1")
 }
