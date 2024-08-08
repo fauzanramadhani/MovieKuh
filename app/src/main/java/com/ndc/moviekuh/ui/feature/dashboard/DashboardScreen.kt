@@ -157,7 +157,7 @@ fun DashboardScreen(
                         modifier = Modifier
                             .weight(0.8f)
                             .clickable {
-
+                                action(DashboardAction.OnBottomSheetVisibilityChange(visible = true))
                             }
                     )
                     Icon(

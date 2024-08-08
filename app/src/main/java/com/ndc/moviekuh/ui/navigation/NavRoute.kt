@@ -15,7 +15,6 @@ const val keyH = "KEY_H"
 
 sealed class NavRoute(val route: String) {
     data object MainRoute : NavRoute("MAIN_ROUTE")
-    data object AuthScreen : NavRoute("AUTH_SCREEN")
     data object DashboardScreen : NavRoute("DASHBOARD_SCREEN")
     data object DetailMovieScreen :
         NavRoute("DETAIL_MOVIE_SCREEN/{$keyA}/{$keyB}/{$keyC}/{$keyD}/{$keyE}/{$keyF}/{$keyG}/{$keyH}") {
@@ -40,4 +39,8 @@ sealed class NavRoute(val route: String) {
                     "$encodedRelease/$isAdult/$encodedSummary"
         }
     }
+    data object DetailPopularMovieScreen : NavRoute("DETAIL_POPULAR_MOVIE_SCREEN")
+    data object DetailNowPlayingMovieScreen : NavRoute("DETAIL_NOW_PLAYING_MOVIE_SCREEN")
+    data object DetailTopRatedMovieScreen : NavRoute("DETAIL_TOP_RATED_MOVIE_SCREEN")
+    data object SearchScreen : NavRoute("SEARCH_SCREEN")
 }

@@ -25,13 +25,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ndc.moviekuh.R
 import com.ndc.moviekuh.ui.theme.MovieKuhTheme
+import com.ndc.moviekuh.utils.format
 
 @Composable
-fun MyProductCard(
+fun SecondaryMovieCard(
     modifier: Modifier = Modifier,
     movieImage: String,
     movieName: String,
-    movieRating: Double,
+    movieRating: Float,
     onClick: () -> Unit = {}
 ) {
     val color = MaterialTheme.colorScheme
@@ -85,7 +86,7 @@ fun MyProductCard(
                             .size(24.dp)
                     )
                     Text(
-                        text = movieRating.toString(),
+                        text = movieRating.format(),
                         style = typography.bodySmall,
                         color = color.primary,
                         maxLines = 1,
@@ -112,10 +113,10 @@ fun MyProductCardPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(5) {
-                MyProductCard(
+                SecondaryMovieCard(
                     movieImage = "https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
                     movieName = "Deadpool & Wolverine",
-                    movieRating = 7.9,
+                    movieRating = 7.9f,
                 )
             }
         }

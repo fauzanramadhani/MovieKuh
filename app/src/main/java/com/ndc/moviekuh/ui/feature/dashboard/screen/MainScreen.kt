@@ -56,13 +56,13 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(verticalScrollState)
             .padding(
                 PaddingValues(
                     top = paddingValues.calculateTopPadding() + 16.dp,
                     bottom = paddingValues.calculateBottomPadding() + 16.dp
                 )
-            )
-            .verticalScroll(verticalScrollState),
+            ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
@@ -88,7 +88,11 @@ fun MainScreen(
                             .size(16.dp)
                     )
                 }
-            )
+            ) {
+                navHostController.navigate(NavRoute.DetailPopularMovieScreen.route) {
+                    launchSingleTop = true
+                }
+            }
         }
         LazyRow(
             state = popularListState,
@@ -158,7 +162,11 @@ fun MainScreen(
                             .size(16.dp)
                     )
                 }
-            )
+            ) {
+                navHostController.navigate(NavRoute.DetailNowPlayingMovieScreen.route) {
+                    launchSingleTop = true
+                }
+            }
         }
         LazyRow(
             state = nowPlayingListState,
@@ -228,7 +236,11 @@ fun MainScreen(
                             .size(16.dp)
                     )
                 }
-            )
+            ) {
+                navHostController.navigate(NavRoute.DetailTopRatedMovieScreen.route) {
+                    launchSingleTop = true
+                }
+            }
         }
         LazyRow(
             state = topRatedListState,

@@ -7,7 +7,7 @@ import com.ndc.moviekuh.data.source.network.response.PopularMovieItem
 import com.ndc.moviekuh.data.source.network.response.TopRatedMovieItem
 import com.ndc.moviekuh.domain.GetNowPlayingMovieListUseCase
 import com.ndc.moviekuh.domain.GetPopularMovieListUseCase
-import com.ndc.moviekuh.domain.GetTopRatedMovieList
+import com.ndc.moviekuh.domain.GetTopRatedMovieListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val getPopularMovieListUseCase: GetPopularMovieListUseCase,
     private val getNowPlayingMovieListUseCase: GetNowPlayingMovieListUseCase,
-    private val getTopRatedMovieListUseCase: GetTopRatedMovieList,
+    private val getTopRatedMovieListUseCase: GetTopRatedMovieListUseCase,
 ) : BaseViewModel<DashboardState, DashboardAction, DashboardEffect>(
     DashboardState()
 ) {

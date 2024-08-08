@@ -9,12 +9,25 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ndc.moviekuh.data.source.local.constant.genresMap
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardEffect
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardScreen
 import com.ndc.moviekuh.ui.feature.dashboard.DashboardViewModel
 import com.ndc.moviekuh.ui.feature.detailmovie.DetailMovieEffect
-import com.ndc.moviekuh.ui.feature.detailmovie.DetailScreen
 import com.ndc.moviekuh.ui.feature.detailmovie.DetailMovieViewModel
+import com.ndc.moviekuh.ui.feature.detailmovie.DetailScreen
+import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieEffect
+import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieScreen
+import com.ndc.moviekuh.ui.feature.detailnowplayingmovie.DetailNowPlayingMovieViewModel
+import com.ndc.moviekuh.ui.feature.detailpopularmovie.DetailPopularMovieEffect
+import com.ndc.moviekuh.ui.feature.detailpopularmovie.DetailPopularMovieScreen
+import com.ndc.moviekuh.ui.feature.detailpopularmovie.DetailPopularMovieViewModel
+import com.ndc.moviekuh.ui.feature.detailtoprated.DetailTopRatedMovieEffect
+import com.ndc.moviekuh.ui.feature.detailtoprated.DetailTopRatedMovieScreen
+import com.ndc.moviekuh.ui.feature.detailtoprated.DetailTopRatedMovieViewModel
+import com.ndc.moviekuh.ui.feature.search.SearchEffect
+import com.ndc.moviekuh.ui.feature.search.SearchScreen
+import com.ndc.moviekuh.ui.feature.search.SearchViewModel
 import com.ndc.moviekuh.utils.decode
 
 @Composable
@@ -75,7 +88,9 @@ fun SetupNavHost(
             val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailMovieEffect.Empty)
             val imageUrl = navBackStackEntry.arguments?.getString(keyA)?.decode() ?: ""
             val title = navBackStackEntry.arguments?.getString(keyB)?.decode() ?: ""
-            val genreList = (navBackStackEntry.arguments?.getString(keyC)?.decode() ?: "").split(", ").map { it.toInt() }
+            val genreList = (navBackStackEntry.arguments?.getString(keyC)?.decode() ?: "")
+                .split(", ").map { it.toInt() }.map { genresMap[it] ?: "" }
+                .filter { it.isNotEmpty() }
             val rating = navBackStackEntry.arguments?.getFloat(keyD) ?: 0f
             val ratingCount = navBackStackEntry.arguments?.getInt(keyE) ?: 0
             val release = navBackStackEntry.arguments?.getString(keyF)?.decode() ?: ""
@@ -95,6 +110,66 @@ fun SetupNavHost(
                 release = release,
                 isAdult = isAdult,
                 summary = summary
+            )
+        }
+
+        composable(
+            route = NavRoute.DetailPopularMovieScreen.route
+        ) {
+            val viewModel = hiltViewModel<DetailPopularMovieViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailPopularMovieEffect.Empty)
+
+            DetailPopularMovieScreen(
+                navHostController = navHostController,
+                state = state,
+                effect = effect,
+                action = viewModel::onAction
+            )
+        }
+
+        composable(
+            route = NavRoute.DetailNowPlayingMovieScreen.route
+        ) {
+            val viewModel = hiltViewModel<DetailNowPlayingMovieViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailNowPlayingMovieEffect.Empty)
+
+            DetailNowPlayingMovieScreen(
+                navHostController = navHostController,
+                state = state,
+                effect = effect,
+                action = viewModel::onAction
+            )
+        }
+
+        composable(
+            route = NavRoute.DetailTopRatedMovieScreen.route
+        ) {
+            val viewModel = hiltViewModel<DetailTopRatedMovieViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = DetailTopRatedMovieEffect.Empty)
+
+            DetailTopRatedMovieScreen(
+                navHostController = navHostController,
+                state = state,
+                effect = effect,
+                action = viewModel::onAction
+            )
+        }
+
+        composable(
+            route = NavRoute.SearchScreen.route
+        ) {
+            val viewModel = hiltViewModel<SearchViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val effect by viewModel.onEffect.collectAsStateWithLifecycle(initialValue = SearchEffect.Empty)
+
+            SearchScreen(
+                navHostController = navHostController,
+                state = state,
+                effect = effect,
+                action = viewModel::onAction
             )
         }
     }

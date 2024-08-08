@@ -47,7 +47,7 @@ fun DetailScreen(
     action: (DetailMovieAction) -> Unit,
     imageUrl: String,
     title: String,
-    genreList: List<Int>,
+    genreList: List<String>,
     rating: Float,
     ratingCount: Int,
     release: String,
@@ -112,7 +112,7 @@ fun DetailScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         genreList.forEach {
-                            GenreChip(text = it.toString())
+                            GenreChip(text = it)
                         }
                     }
                     Row(
@@ -214,7 +214,7 @@ fun DetailScreenPreview() {
             },
             imageUrl = "https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
             title = "Deadpool & Wolverine ",
-            genreList = listOf(1, 2, 3),
+            genreList = listOf("Action"),
             rating = 7.9F,
             ratingCount = 1886,
             release = "05-12-2001",
