@@ -30,5 +30,5 @@ Proyek ini memerlukan konfigurasi API yang harus disimpan dalam file `local.prop
    # URL dasar untuk API
    BASE_URL = https://api.themoviedb.org/3/
 
-   # Kunci API untuk akses API
+   # Kunci API untuk akses API, anda dapat mendapatkan API anda dengan registasi disini (https://developer.themoviedb.org)
    API_KEY = YOUR_API_KEY_HERE
